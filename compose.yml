@@ -4,19 +4,13 @@ volumes:
   smtp_relay:
 
 secrets:
-  smtp_relay_admin_password:
-    name: ${STACK_NAME:-technocore}_smtp_relay_admin_password
+  smtp_relay_smtp_password:
+    name: ${STACK_NAME:-technocore}_smtp_relay_smtp_password
     external: true
 
 services:
-  ## Uncomment this if Traefik will be used for routing traffick to this service.
-  #ingress:
-  #  networks:
-  #    - smtp_relay
 
   smtp_relay:
-    #override the default command with one that stores smtp credentials, since the image doesn't do this natively
-    command: '/bin/bash -c "echo $$POSTFIX_relayhost $$relayhost_username:$$relayhost_passwd > /etc/postfix/sasl/sasl_passwd && /usr/sbin/postmap /etc/postfix/sasl/sasl_passwd && /root/run"'
     deploy:
       labels:
         - com.ouroboros.enable=true
@@ -65,17 +59,6 @@ services:
       driver: "${LOGGING_DRIVER}"
       options:
         tag: "{{.Name}}"
-    #secrets:
-    #  - source: smtp_relay_smtp_relay_db_password
-    #    target: smtp_relay_db_password
-    volumes:
-      # Likely need to change this
-      - smtp_relay:/var/lib/smtp_relay
-      - ${DEV_MOUNT_SMTP_RELAY_SHELL_MIGRATIONS:-$EMPTY_MOUNT}
-      - mail-relay-lib-postfix:/var/lib/postfix
-      - mail-relay-mail:/var/mail
-      - mail-relay-spool-postfix:/var/spool/postfix
-      - mail-relay-opendkim-keys:/etc/opendkim/keys
-      - mail-relay-sasl:/etc/postfix/sasl
-      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro #use host's CAs to validate remote SMTP certs, may need to change if not on debian-based linux
-
+    secrets:
+      - source: smtp_relay_smtp_password
+        target: smtp_password
