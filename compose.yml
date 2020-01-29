@@ -27,6 +27,12 @@ services:
         reservations:
           memory: 64M
     environment:
+      - HOSTNAME=smtp_relay
+      - RELAYHOST=${TECHNOCORE_SMTP_HOST}:587
+      - RELAYHOST_USERNAME=${TECHNOCORE_SMTP_USERNAME}
+      - RELAYHOST_PASSWORD={{"{{DOCKER-SECRET:smtp_password}}"}}
+      - ALLOWED_SENDER_DOMAINS=${TECHNOCORE_SMTP_ALLOWED_DOMAINS}
+      - TZ=${TZ}
     image: ${image_provider:-scififarms}/technocore-smtp-relay:${TAG:-latest}
     logging:
       driver: "${LOGGING_DRIVER}"
