@@ -14,6 +14,7 @@ services:
     deploy:
       labels:
         - com.ouroboros.enable=true
+        - user-provided-secret-dns_token=smtp_relay smtp_password
       mode: global
       restart_policy:
         condition: any
